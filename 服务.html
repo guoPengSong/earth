@@ -1,0 +1,62 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<title>服务</title>  
+<style type="text/css">  
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#map{height:100%}  
+</style>  
+<!--<script src="http://api.map.baidu.com/api?v=1.0"></script>-->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=tqKr4lHTZNQiRPbEoGx1oyPs4QWK1EXj">
+//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+//v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
+</script>
+<script type="text/javascript" src="js/distanceTool.js"></script>
+<script src="js/rectangleZoom.js"></script>
+</head>  
+ 
+<body>  
+<div id="map"></div>
+<div id="log"></div>
+<div id="r-results"></div>
+</body>  
+</html>
+<script type="text/javascript"> 
+	var map = new BMap.Map("map",{mapType:BMAP_HYBRID_MAP});      
+	map.centerAndZoom(new BMap.Point(116.490192, 40.012862), 18);  
+	map.addControl(new BMap.NavigationControl());
+	map.addControl(new BMap.MapTypeControl());
+	map.enableScrollWheelZoom();
+//	var local = new BMap.LocalSearch(map, {      
+//	      renderOptions:{map: map}      
+//	});      
+//	local.search("霍营");
+
+
+//	var local = new BMap.LocalSearch("北京市",   
+//      {renderOptions: {map: map,autoViewport: true},pageCapacity: 8});      
+//	local.search("中关村");
+
+	
+	var local = new BMap.LocalSearch(map,   
+        {renderOptions: {map: map,panel: "results"}});      
+	local.search("中关村");
+
+//	var options = {      
+//	      onSearchComplete: function(results){      
+//	          if (local.getStatus() == BMAP_STATUS_SUCCESS){      
+//	                // 判断状态是否正确      
+//	                var s = [];      
+//	                for (var i = 0; i < results.getCurrentNumPois(); i ++){      
+//	                    s.push(results.getPoi(i).title + ", " + results.getPoi(i).address);      
+//	                }      
+//	             document.getElementById("log").innerHTML = s.join("<br>");      
+//	          }      
+//	      }      
+//	 };      
+//	var local = new BMap.LocalSearch(map, options);      
+//	local.search("公园");
+</script>

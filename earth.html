@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+
+	<head>
+		<title>地球仪</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+		<style>
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			html,body{
+				height: 100%;
+			}
+			body {
+				color: white;
+				cursor: pointer;
+			}
+			#canvasContainer{
+				height: 100%;
+				background-color: rgb(0, 26, 34);
+				background: url('img/sky.jpg');
+			}
+			ul#magnitudes {
+				position: absolute;
+				top: 100px;
+				left: 30px;
+				padding: 0;
+				margin: 0;
+				list-style: none;
+				z-index: 10;
+			}
+			
+			h1 {
+				position: absolute;
+				top: 50px;
+				left: 5px;
+				padding: 0;
+				margin: 0;
+				z-index: 10;
+			}
+			
+			canvas {
+				position: absolute;
+				top: 60px;
+				left: 0;
+				right: 0;
+				bottom: 0px;
+				cursor: move;
+				cursor: pointer;
+			}
+			
+			#controls {
+				position: absolute;
+				width: 400px;
+				bottom: 5px;
+				left: 50%;
+				margin-left: -200px;
+				text-align: center;
+			}
+			
+			input[type=range] {
+				width: 400px;
+			}
+			#detail{
+				padding: 20px;
+				position: absolute;
+				right: 30px;
+				bottom: 50px;
+				height: 0;
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!--<div class='ui fixed inverted large menu main-menu'>
+			<div class='items'>
+				<a class='item title' href='/'>
+					<i class='globe icon'></i>Planetary.js
+				</a>
+				<span class='spacer hide-on-mobile'></span>
+				<a class='item minor ' href='/download/'>
+					<i class='download icon'></i><span class='hide-on-mobile'>Download</span>
+				</a>
+				<a class='item minor active' href='/examples/'>
+					<i class='laptop icon'></i><span class='hide-on-mobile'>Examples</span>
+				</a>
+				<a class='item minor ' href='/documentation/'>
+					<i class='book icon'></i><span class='hide-on-mobile'>Documentation</span>
+				</a>
+				<a class='item minor' href='https://github.com/BinaryMuse/planetary.js' onclick="_gaq.push(['_trackPageview', '/redirect-to-github-project-page']);">
+					<i class='github alternate icon'></i><span class='hide-on-mobile'>Fork on GitHub</span>
+				</a>
+			</div>
+		</div>-->
+
+	<!--	<h1>Earthquakes: 2013</h1>-->
+		<!--<ul id='magnitudes'></ul>-->
+		<div id="canvasContainer">
+			<canvas id='quakeCanvas'></canvas>
+		</div>
+		<!--<div id="map"></div>-->
+		<!--<div id='controls'>
+			<div>
+				<input id='slider' type='range' min='0' max='100' step='0.1' value='0'>
+			</div>
+			<div>
+				<span id='date'>Loading...</span>
+			</div>
+		</div>-->
+
+		<script type='text/javascript' src="js/d3.v3.min.js"></script>
+		<script type='text/javascript' src="js/topojson.v1.min.js"></script>
+		<script type="text/javascript" src="js/planetaryjs.min.js"></script>
+
+		<script type='text/javascript' src='js/moment.min.js'></script>
+		<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=tqKr4lHTZNQiRPbEoGx1oyPs4QWK1EXj">
+		//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+		//v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
+		</script>
+		<script type='text/javascript' src='js/quake.js'></script>
+
+	</body>
+
+</html>
+<script>
+	var quakerCanvas=document.getElementById("quakeCanvas");
+	var canvasContainer=document.getElementById("canvasContainer");
+	var detail=document.getElementById("detail");
+	var body=document.documentElement||document.body;
+	var data_info = [[121.473586,31.23235,"IP：10.10.12.1<br>手机号：15088888888"],
+					 [113.262643,23.136901,"IP：10.10.12.2<br>手机号：15088888888"],
+					 [116.403981,39.914714,"IP：10.10.12.3<br>手机号：15088888888"],
+					 [114.0635,22.547522,"IP：10.10.12.4<br>手机号：15088888888"]
+					];
+	var opts = {
+				width : 100,     // 信息窗口宽度
+				height: 50,     // 信息窗口高度
+				title : "信息窗口" , // 信息窗口标题
+				enableMessage:true//设置允许信息窗发送短息
+			   };
+	
+		function baiduMap(){
+			quakerCanvas.width=0;
+			quakerCanvas.height=0;
+			canvasContainer.innerHTML='<div id="map"></div>';
+			
+			
+			
+			
+			var mapContainer=document.getElementById("map");
+			mapContainer.style.height="100%";
+			var width=canvasContainer.offsetWidth;
+			var height=canvasContainer.offsetHeight;
+			var map = new BMap.Map("map",{mapType:BMAP_HYBRID_MAP,minZoom:5});    
+			var point = new BMap.Point(103.452303, 37.786044); 
+			map.centerAndZoom(point, 5);  // 编写自定义函数，创建标注   
+			//开启鼠标滚轮缩放
+			map.enableScrollWheelZoom(true); 
+			function addMarker(point, index){  // 创建图标对象   
+				var myIcon = new BMap.Icon("img/add2.png", new BMap.Size(21, 34), {  
+					//http://api.map.baidu.com/img/markers.png
+				// 指定定位位置。   
+				// 当标注显示在地图上时，其所指向的地理位置距离图标左上    
+				// 角各偏移10像素和25像素。您可以看到在本例中该位置即是   
+				   // 图标中央下端的尖角位置。    
+//				   offset: new BMap.Size(15, 42),    
+				   // 设置图片偏移。   
+				   // 当您需要从一幅较大的图片中截取某部分作为标注图标时，您   
+				   // 需要指定大图的偏移位置，此做法与css sprites技术类似。    
+		//		   imageOffset: new BMap.Size(0, 0 - index * 25)   // 设置图片偏移    
+				 });      
+				// 创建标注对象并添加到地图   
+				 var marker = new BMap.Marker(point, {icon: myIcon});    
+				 map.addOverlay(marker); 
+				 marker.setAnimation(BMAP_ANIMATION_DROP); //跳动的动画
+				 addClickHandler(content,marker);
+			}
+			
+			function addChangeMarker(point, index){  // 创建图标对象   
+				var myIcon = new BMap.Icon("img/add01.png", new BMap.Size(21, 34), {  
+					//http://api.map.baidu.com/img/markers.png
+				// 指定定位位置。   
+				// 当标注显示在地图上时，其所指向的地理位置距离图标左上    
+				// 角各偏移10像素和25像素。您可以看到在本例中该位置即是   
+				   // 图标中央下端的尖角位置。    
+//				   imageOffset: new BMap.Size(-5, -5),    
+				   // 设置图片偏移。   
+				   // 当您需要从一幅较大的图片中截取某部分作为标注图标时，您   
+				   // 需要指定大图的偏移位置，此做法与css sprites技术类似。    
+		//		   imageOffset: new BMap.Size(0, 0 - index * 25)   // 设置图片偏移    
+				 });      
+				// 创建标注对象并添加到地图   
+				 var marker = new BMap.Marker(point, {icon: myIcon});    
+				 map.addOverlay(marker); 
+//				 addClickHandler(content,marker);
+			}
+			
+			for(var i=0;i<data_info.length;i++){
+				var point=new BMap.Point(data_info[i][0],data_info[i][1]);
+				var content = data_info[i][2];              // 将标注添加到地图中
+				addMarker(point,i,content);
+			}
+			function addClickHandler(content,marker){
+				marker.addEventListener("click",function(e){
+					openInfo(content,e)}
+				);
+			}
+			function openInfo(content,e){
+				var p = e.target;
+				var point = new BMap.Point(p.getPosition().lng, p.getPosition().lat);
+				var infoWindow = new BMap.InfoWindow(content,opts);  // 创建信息窗口对象 
+				map.openInfoWindow(infoWindow,point); //开启信息窗口
+			}
+			/*addMarker(new BMap.Point(121.473586,31.23235),0);//上海
+			addMarker(new BMap.Point(113.262643,23.136901),1);//广州
+			addMarker(new BMap.Point(116.403981,39.914714),2);//北京
+			addMarker(new BMap.Point(114.0635,22.547522),3);//深圳*/
+/*			setTimeout(function(){
+				map.panTo(new BMap.Point(116.403981,39.914714));   //两秒后移动到北京
+				setTimeout(function(){
+					map.setZoom(11);
+				},1000);
+			}, 2000);*/
+			canvasContainer.style.background="#ffffff";
+			
+			var allOverlay = map.getOverlays();
+			for (var i = 0; i < allOverlay.length ; i++){
+				console.log(allOverlay[i]);
+				allOverlay[i].addEventListener("click",function(){
+					var point=this.getPosition();
+					map.removeOverlay(this);
+					addChangeMarker(point)
+				})
+			}
+		}
+		var downObj={};
+		quakerCanvas.onmousedown=function(e){
+			downObj.x=e.clientX;
+			downObj.y=e.clientY;
+		};
+		
+		quakerCanvas.onmouseup=function(e){
+			if(e.clientX===downObj.x && e.clientY===downObj.y){
+				baiduMap();
+			}
+		}
+</script>

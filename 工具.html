@@ -1,0 +1,34 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<title>工具</title>  
+<style type="text/css">  
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#container{height:100%}  
+</style>  
+<script src="http://api.map.baidu.com/api?v=1.0"></script>
+<!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=tqKr4lHTZNQiRPbEoGx1oyPs4QWK1EXj">
+//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+//v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
+</script>-->
+</head>  
+ 
+<body>  
+<div id="container"></div> 
+</body>  
+</html>
+<script type="text/javascript"> 
+	var map = new BMap.Map("container");    
+	map.centerAndZoom(new BMap.Point(116.404, 39.915), 15); 
+	map.enableScrollWheelZoom();
+	var myPushpin = new BMap.PushpinTool(map);         // 创建标注工具实例    
+	myPushpin.addEventListener("markend", function(e){  // 监听事件，提示标注点坐标信息   
+	 alert("您标注的位置：" +     
+	       e.marker.getPoint().lng + ", " +     
+	       e.marker.getPoint().lat);    
+	});    
+	myPushpin.open();                                  // 开启标注工具
+</script>

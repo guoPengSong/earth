@@ -1,0 +1,83 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
+<title>自定义标注图标</title>  
+<style type="text/css">  
+html{height:100%}  
+body{height:100%;margin:0px;padding:0px}  
+#container{height:100%}  
+</style>  
+<!--<script src="http://api.map.baidu.com/api?v=1.0"></script>-->
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=tqKr4lHTZNQiRPbEoGx1oyPs4QWK1EXj">
+//v2.0版本的引用方式：src="http://api.map.baidu.com/api?v=2.0&ak=您的密钥"
+//v1.4版本及以前版本的引用方式：src="http://api.map.baidu.com/api?v=1.4&key=您的密钥&callback=initialize"
+</script>
+</head>  
+ 
+<body>  
+<div id="container"></div> 
+<script type="text/javascript"> 
+	var map = new BMap.Map("container",{mapType:BMAP_HYBRID_MAP});    
+	var point = new BMap.Point(103.452303, 37.786044);    
+	map.centerAndZoom(point, 5);  // 编写自定义函数，创建标注   
+	//开启鼠标滚轮缩放
+	map.enableScrollWheelZoom(true); 
+	
+	map.addEventListener("mouseup",function(){
+		console.log(map.getCenter());
+	})
+	
+	function addMarker(point, index){  // 创建图标对象   
+		var myIcon = new BMap.Icon("img/markers.png", new BMap.Size(23, 37), {  
+			//http://api.map.baidu.com/img/markers.png
+		// 指定定位位置。   
+		// 当标注显示在地图上时，其所指向的地理位置距离图标左上    
+		// 角各偏移10像素和25像素。您可以看到在本例中该位置即是   
+		   // 图标中央下端的尖角位置。    
+		   offset: new BMap.Size(10, 37),    
+		   // 设置图片偏移。   
+		   // 当您需要从一幅较大的图片中截取某部分作为标注图标时，您   
+		   // 需要指定大图的偏移位置，此做法与css sprites技术类似。    
+//		   imageOffset: new BMap.Size(0, 0 - index * 25)   // 设置图片偏移    
+		 });      
+		// 创建标注对象并添加到地图   
+		 var marker = new BMap.Marker(point, {icon: myIcon});    
+		 map.addOverlay(marker); 
+		 //标注允许拖拽
+		 marker.enableDragging(); 
+		 //标注绑定点击事件
+		 marker.addEventListener("dragend", function(e){
+		 	alert("当前位置：" + e.point.lng + ", " + e.point.lat);  
+		 });
+		 //添加信息窗口
+//		 var opts = { 
+//		 	width : 250,     // 信息窗口宽度 
+//		 	height: 100,     // 信息窗口高度 
+//		 	title : "Hello"  // 信息窗口标题 
+//		 	} 
+//		 var infoWindow = new BMap.InfoWindow("World", opts);   // 创建信息窗口对象 
+//		 map.openInfoWindow(infoWindow, map.getCenter());      // 打开信息窗口
+//		 //添加折线
+//		 var polyline = new BMap.Polyline([    
+//		   new BMap.Point(116.399, 39.910),    
+//		   new BMap.Point(116.405, 39.920)    
+//		 ],    
+//		 {strokeColor:"blue", strokeWeight:6, strokeOpacity:0.5}    
+//		);    
+//		map.addOverlay(polyline);
+	}    
+	// 随机向地图添加10个标注    
+	var bounds = map.getBounds();  
+	var lngSpan = bounds.Ee - bounds.Je;    
+	var latSpan = bounds.De - bounds.Ie;  
+	for (var i = 0; i < 10; i ++) {    
+	 var point = new BMap.Point(bounds.Je + lngSpan * (Math.random() * 0.7 + 0.15),    
+	                            bounds.Ie + latSpan * (Math.random() * 0.7 + 0.15));
+	 addMarker(point, i); 
+	}
+
+</script>  
+</body>  
+</html>
